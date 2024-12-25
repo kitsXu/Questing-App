@@ -4,16 +4,17 @@ import "./Dailies.css";
 //-- TO DO --
 // - [ ] make the explanation div appear on hover of a little box/question mark icon
 
-
 export default function Dailies(props) {
   const [newDaily, setNewDaily] = useState("");
   const [dailies, setDailies] = useState(props.currentDailyQuests ?? []);
 
   useEffect(() => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...props.user, currentDailyQuests: dailies })
-    );
+    // localStorage.setItem(
+    //   "user",
+    //   JSON.stringify({ ...props.user, currentDailyQuests: dailies })
+    // );
+
+    props.setCurrentDailyQuests(dailies);
   }, [dailies]);
 
   function handleDailySubmit(e) {
@@ -38,14 +39,16 @@ export default function Dailies(props) {
     setDailies((currentDailies) => {
       return currentDailies.filter((daily) => daily.id !== id);
     });
-    localStorage.removeItem(
-      "user",
-      JSON.stringify({
-        ...props.user,
-        dailyQuestsCompleted,
-      })
-    );
-    return props.setNewAbandonedDailyQuestCount((prev) => prev + 1);
+    // localStorage.removeItem(
+    //   "user",
+    //   JSON.stringify({
+    //     ...props.user,
+    //     dailyQuestsCompleted,
+    //   })
+    // );
+    props.setNewAbandonedDailyQuestCount((prev) => prev + 1);
+
+    return;
   }
 
   const resetAllDailies = (id, completed) => {
@@ -66,12 +69,14 @@ export default function Dailies(props) {
 
   return (
     <div className="bodyWrapper">
+      <div className="headDivider">§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§</div>
       <h1 className="dailyHeader">{props.user.name}'s Daily Routine</h1>
       <p className="daily-info">
         &#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;&#8287;Create
         your daily routine by adding tasks into the log below. Check tasks off
         your list as you complete them, and then hit the 'COMPLETE YOUR DAILY
-        ROUTINE' button at the end of the day to turn in and gain your experience (1xp per task)
+        ROUTINE' button at the end of the day to turn in and gain your
+        experience (1xp per task)
       </p>
       <form onSubmit={handleDailySubmit} className="new-daily-form">
         <div className="daily-form-row">
@@ -106,7 +111,7 @@ export default function Dailies(props) {
               <button
                 onClick={() => {
                   deleteDaily(daily.id);
-                  props.user.abandonedDailyQuests++;
+                  // props.user.abandonedDailyQuests++;
                 }}
                 className="btn btn-danger"
               >
@@ -119,7 +124,10 @@ export default function Dailies(props) {
       <button onClick={resetAllDailies} className="foot" id="clearBtn">
         COMPLETE YOUR DAILY QUESTS!
       </button>
-      <div className="divider">__________</div>
+      <div className="divider">_________</div>
+      <div className="logo">
+        <a className="logo-tag" href="https://ko-fi.com/kitsxu">-kitsXu-</a>
+      </div>
     </div>
   );
 }

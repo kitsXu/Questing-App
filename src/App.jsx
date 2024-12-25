@@ -1,31 +1,19 @@
 import { useEffect, useState } from "react";
 import "./style.css";
-import UserProfile from "./components/UserProfile.jsx";
-import Quests from "./components/Quests.jsx";
-import LandingPage from "./components/LandingPage.jsx";
-import BroodRecord from "./components/BroodRecord.jsx";
+import Archives from "./components/Archives/Archives.jsx"
+import Quests from "./components/Quests/Quests.jsx";
+import BroodRecord from "./components/Brood/BroodRecord.jsx";
 import { chkLevelUp } from "./funcs/chkLevelUp.js";
-import Dailies from "./components/Dailies.jsx";
+import Dailies from "./components/Dailies/Dailies.jsx";
+import Market from "./components/Market/Market.jsx";
+import Inventory from "./components/Inventory/Inventory.jsx";
+import { LoadingIndicator } from "./components/LandingPage/LoadingIndicator.jsx";
+import Logo from "./components/LandingPage/Logo.jsx";
 
 //-- TODO:
-//  - [x] check if a user object exists within local storage
-//  - [x] if a user does _not_ exist, create a new one and store it
-//  - [x] if a user _does_ exist, use the object that is returned for our current unpmser
-//  - [x] pass new user object into relevent components
-//  - [x] prompt for user to select their own name
-//  - [x] stores quest and abandon counts locally?
-
-//  - [x] daily quests completed counted by 'clear completed', still xp per daily
-//  - [x] 'clear completed' cannot be pressed unless all daily quests are checked?
-//  - [x] change empty quest board to appropriate message, if quests have been completed or not
-//  - [x] storing the daily tasks created by user
-//  - [x] set experience up to work
-//  - [X] make quests worth more!
-
-// --FIX BEFORE STARTING ON EGGS --
-//  - [ ] BUG!  Quests reappear whenever you press abandon and refresh
-// -- [ ] set 'view' to local storage, when user refreshes return the page they were on
-//  - [ ] check daily lvls stored locally, have to refresh for update rn
+//  - [X] BUG!  Quests reappear whenever you press abandon and refresh
+// -- [X] set 'view' to local storage, when user refreshes so we return the page they were on
+//  - [ ] check that dailies are stored correctly, have to refresh for update rn
 //  - [ ] store user made quests locally
 //  - [ ] check quests entered against local storage 'quests', if they are there you can't accept
 //  - [ ] make a maximum of daily quests??
@@ -33,13 +21,11 @@ import Dailies from "./components/Dailies.jsx";
 //  - [ ] create time stamp for daily quest turn in button stored locally? idk
 //  - [ ] daily quest turn in button timer can't be pressed again for 24hrs?
 
-
 export default function App() {
-  const [view, setView] = useState("dailies");
+  const [view, setView] = useState(localStorage.getItem("view") ?? "archives");
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [newName, setNewName] = useState("");
-  const [nameFormVisibility, setNameFormVisibility] = useState(false);
   const [newDailyQuestsCompletedCount, setNewDailyQuestsCompletedCount] =
     useState();
   const [newQuestCompletedCount, setNewQuestCompletedCount] = useState();
@@ -47,11 +33,6 @@ export default function App() {
   const [newAbandonedDailyQuestCount, setNewAbandonedDailyQuestCount] =
     useState();
   const [currentDailyQuests, setCurrentDailyQuests] = useState([]);
-  // const [nextLevelExperience, setNextLevelExperience] = useState();
-
-  useEffect(() => {
-    console.log("useEffect -- refreshKey: ", refreshKey);
-  }, [refreshKey]);
 
   useEffect(() => {
     if (typeof user !== "object") {
@@ -59,8 +40,14 @@ export default function App() {
     }
   }, [user]);
 
+  useEffect(() => {
+    localStorage.setItem("view", view ?? "archives");
+  }, [view]);
+
   //-- user "auth". check if user exists in local storage. if it does, load it. if it doesn't, create one.
   useEffect(() => {
+    setIsLoading(true);
+
     const userExists = localStorage.getItem("user");
 
     if (!userExists) {
@@ -75,13 +62,15 @@ export default function App() {
         dailyQuestsCompleted: 0,
         abandonedDailyQuests: 0,
         currentDailyQuests: [],
+        gold: 0,
+        goldIncrease: 50,
+        nxtLvl: 1,
       };
 
       localStorage.setItem("user", JSON.stringify(newUserObject));
-      localStorage.setItem("view", view); //set view to local storage
-
       setUser(newUserObject);
-      setView("LandingPage");
+
+      setIsLoading(false);
 
       return;
     }
@@ -93,32 +82,15 @@ export default function App() {
     setNewDailyQuestsCompletedCount(user.dailyQuestsCompleted);
     setNewQuestCompletedCount(user.questCompleted);
     setNewAbandonedQuestCount(user.abandonedQuests);
-    setNewAbandonedDailyQuestCount(user.abandonedQuests);
+    setNewAbandonedDailyQuestCount(user.abandonedDailyQuests);
     setCurrentDailyQuests(user.currentDailyQuests);
+
+    const savedView = localStorage.getItem("view");
+
+    setView(savedView ?? "archives");
+
+    setIsLoading(false);
   }, [refreshKey]);
-
-  useEffect(() => {
-    console.log(
-      "useEffect -- newQuestCompletedCount: ",
-      newQuestCompletedCount
-    );
-  }, [newQuestCompletedCount]);
-
-  // //-- if user exists, attach questing states for updating local storage to user object values
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   console.log(`\nuseEffect -- [user] (all state setter functions) triggered!`)
-  //   console.log("useEffect -- newQuestCompletedCount: ", newQuestCompletedCount)
-
-  //   setNewDailyQuestsCompletedCount(user.dailyQuestsCompleted);
-  //   setNewQuestCompletedCount(user.questCompleted);
-  //   setNewAbandonedQuestCount(user.abandonedQuests);
-  //   setNewAbandonedDailyQuestCount(user.abandonedQuests);
-  //   setCurrentDailyQuests(user.currentDailyQuests);
-
-  //   //-- TODO: hook up experience and level to local state so we can update front-end.
-  // }, [user]);
 
   useEffect(() => {
     if (!user || !user.experience) return;
@@ -126,15 +98,10 @@ export default function App() {
     chkLevelUp(user);
   }, [user]);
 
-  // Save the view to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("view", view);
-  }, [view]);
 
   //-- create new updated user object to update both local storage user record and local user object state.
   useEffect(() => {
     if (!user) return;
-
     const updatedUser = {
       ...user,
       level:
@@ -143,26 +110,14 @@ export default function App() {
           : user.level,
 
       experience: user.questCompleted * 4 + user.dailyQuestsCompleted,
+
     };
-
     localStorage.setItem("user", JSON.stringify(updatedUser));
-
     setUser(updatedUser);
-  }, [
-    newDailyQuestsCompletedCount,
-    newQuestCompletedCount,
-    newAbandonedQuestCount,
-    newAbandonedDailyQuestCount,
-  ]);
+  }, [newDailyQuestsCompletedCount, newQuestCompletedCount]);
 
   useEffect(() => {
     if (!user) return;
-    console.log(`\nuseEffect -- [newQuestCompletedCount] triggered!`);
-    console.log(
-      "useEffect -- newQuestCompletedCount: ",
-      newQuestCompletedCount
-    );
-
     localStorage.setItem(
       "user",
       JSON.stringify({
@@ -181,6 +136,8 @@ export default function App() {
         ...(user.abandonedDailyQuests !== newAbandonedDailyQuestCount
           ? { abandonedDailyQuests: newAbandonedDailyQuestCount }
           : {}),
+        //-- i.e., currentDailyQuests: currentDailyQuests,
+        currentDailyQuests,
       })
     );
   }, [
@@ -188,109 +145,72 @@ export default function App() {
     newQuestCompletedCount,
     newAbandonedQuestCount,
     newAbandonedDailyQuestCount,
+    currentDailyQuests,
   ]);
 
-  //-- submit name form on landing page.
-  const handleSubmit = () => {
-    if (!user) return; //-- TODO: handle this better.
-    localStorage.setItem("user", JSON.stringify({ ...user, name: newName }));
-    setView("user");
-    setRefreshKey((prev) => prev + 1);
-    console.log("User information updated!");
-  };
 
-  const handleOnChange = (value) => {
-    setNewName(value);
-  };
 
-  useEffect(() => {
-    view === "LandingPage"
-      ? setNameFormVisibility(true)
-      : setNameFormVisibility(false);
-  }, [view]);
-
-  //-- set view to landing page if user name hasn't been set.
-  useEffect(() => {
-    if (!user) return;
-    if (!user.name) {
-      setView("LandingPage");
-      return;
-    }
-    setView("dailies");
-  }, []);
-
-  useEffect(() => {
-    const savedView = localStorage.getItem("view");
-    if (user) {
-      setView(savedView); // Set the state to the saved view
-    }
-  }, [user]);
+  if (isLoading) return <LoadingIndicator />;
 
   return (
     <div className="bodywrapper">
-      <header>brood leader</header>
-      {view !== "LandingPage" && (
-        <div className="userBtn">
-          <button className="menuBtn" onClick={() => setView("dailies")}>
-            Daiy Routine
-          </button>
-          <button className="menuBtn" onClick={() => setView("quests")}>
-            Quests
-          </button>
-          <button className="menuBtn" onClick={() => setView("user")}>
-            Records
-          </button>
-          <button className="menuBtn" onClick={() => setView("brood")}>
-            Brood
-          </button>
-        </div>
-      )}
-      <div>
-        {view === "LandingPage" && !!user && <LandingPage user={user} />}
-        {view === "user" && !!user && <UserProfile user={user} />}
-        {view === "quests" && !!user && (
-          <Quests
-            user={user}
-            newQuestCompletedCount={newQuestCompletedCount}
-            setNewQuestCompletedCount={setNewQuestCompletedCount}
-            newAbandonedQuestCount={newAbandonedQuestCount}
-            setNewAbandonedQuestCount={setNewAbandonedQuestCount}
-            setRefreshKey={setRefreshKey}
-          />
-        )}
-        {view === "dailies" && !!user && (
-          <Dailies
-            user={user}
-            newDailyQuestsCompletedCount={newDailyQuestsCompletedCount}
-            setNewDailyQuestsCompletedCount={setNewDailyQuestsCompletedCount}
-            newAbandonedDailyQuestCount={newAbandonedDailyQuestCount}
-            setNewAbandonedDailyQuestCount={setNewAbandonedDailyQuestCount}
-            currentDailyQuests={user.currentDailyQuests}
-            setRefreshKey={setRefreshKey}
-          />
-        )}
-        {view === "brood" && !!user && <BroodRecord user={user} />}
-      </div>
-      {nameFormVisibility && (
-        <form
-          className="nameInput"
-          onSubmit={(e) => {
-            //-- prevent default behavior of the event. in this case, stop the form submission
-            //-- from refreshing the page.
-            e.preventDefault();
 
-            handleSubmit(newName);
-          }}
-        >
-          <label htmlFor="nameInputBar">NAME</label>
-          <input
-            value={newName}
-            type="text"
-            onChange={(event) => handleOnChange(event.target.value)}
-            id="nameInputBar"
-          />
-          <button className="nameInput">submit</button>
-        </form>
+      {!user || !user.name && !isLoading ? (
+        <Logo user={user} isLoading={isLoading} setRefreshKey={setRefreshKey} />
+      ) : (
+        <>
+          <header>brood leader</header>
+          <div className="menuWrapper">
+            <button className="menuBtn" onClick={() => setView("dailies")}>
+              Dailies
+            </button>
+            <button className="menuBtn" onClick={() => setView("quests")}>
+              Quests
+            </button>
+            <button className="menuBtn" onClick={() => setView("market")}>
+              Market
+            </button>
+            <button className="menuBtn" onClick={() => setView("brood")}>
+              Brood
+            </button>
+            <button className="menuBtn" onClick={() => setView("inventory")}>
+              Inventory
+            </button>
+            <button className="menuBtn" onClick={() => setView("archives")}>
+              Archives
+            </button>
+          </div>
+          <div>
+            {view === "archives" && !!user && <Archives user={user} />}
+            {view === "market" && !!user && <Market user={user} />}
+            {view === "inventory" && !!user && <Inventory user={user} />}
+            {view === "quests" && !!user && (
+              <Quests
+                user={user}
+                newQuestCompletedCount={newQuestCompletedCount}
+                setNewQuestCompletedCount={setNewQuestCompletedCount}
+                newAbandonedQuestCount={newAbandonedQuestCount}
+                setNewAbandonedQuestCount={setNewAbandonedQuestCount}
+                setRefreshKey={setRefreshKey}
+              />
+            )}
+            {view === "dailies" && !!user && (
+              <Dailies
+                user={user}
+                newDailyQuestsCompletedCount={newDailyQuestsCompletedCount}
+                setNewDailyQuestsCompletedCount={
+                  setNewDailyQuestsCompletedCount
+                }
+                newAbandonedDailyQuestCount={newAbandonedDailyQuestCount}
+                setNewAbandonedDailyQuestCount={setNewAbandonedDailyQuestCount}
+                setCurrentDailyQuests={setCurrentDailyQuests}
+                currentDailyQuests={user.currentDailyQuests}
+                setRefreshKey={setRefreshKey}
+              />
+            )}
+            {view === "brood" && !!user && <BroodRecord user={user} />}
+          </div>
+        </>
       )}
     </div>
   );

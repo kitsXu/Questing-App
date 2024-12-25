@@ -3,7 +3,11 @@
   background: #e6e3cc;
   text-align: center;
   font-size: 1.2rem;
-  margin: 4rem 0 1rem 0;
+  margin: 2rem 0 2rem 0;
+}
+
+.questWrapper {
+  background: #e6e3cc;
 }
 
 #completeQuest {
@@ -29,9 +33,8 @@
 
 .new-quest-form input {
   outline: none;
-  border: 4px double hsl(41, 39%, 23%);
+  border: 3px double hsl(29, 44%, 22%);
   background: hsla(61, 35%, 39%, 0.781);
-  border-radius: 0.25em;
   padding: 0.25em 1em;
   color: hsl(60, 59%, 85%);
   font-size: 20px;
@@ -40,23 +43,7 @@
 }
 
 .new-quest-form input:focus {
-  border: 4px ridge hsl(54, 86%, 31%);
-}
-
-.new-daily-form input {
-  outline: none;
-  border: 4px double hsl(41, 39%, 23%);
-  background: hsla(61, 35%, 39%, 0.781);
-  border-radius: 0.25em;
-  padding: 0.25em 1em;
-  color: hsl(60, 59%, 85%);
-  font-size: 20px;
-  font-family: "Courier New", Courier, monospace;
-  height: 35px;
-}
-
-.new-daily-form input:focus {
-  border: 4px ridge hsl(54, 86%, 31%);
+  border: 3px ridge hsla(61, 35%, 39%, 0.781);
 }
 
 .quest-header {
@@ -111,4 +98,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.logo-tag-quest {
+  background: #e6e3cc;
+  text-decoration: none;
+  margin-top: 16.4vh;
+  color: hsl(41, 39%, 23%);
+  cursor:default;
+  font-size: 12px;
 }
