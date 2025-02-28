@@ -5,15 +5,16 @@ import { chkLevelUp } from "./funcs/chkLevelUp.js";
 import "./style.css";
 
 import Archives from "./components/Archives/Archives.jsx";
+import Maps from "./components/Maps/Maps.jsx";
+import Spells from "./components/Inventory/Spells.jsx";
 import Quests from "./components/Quests/Quests.jsx";
-import BroodRecord from "./components/Inventory/BroodRecord.jsx";
-import Dailies from "./components/Dailies/Dailies.jsx";
 import Market from "./components/Market/Market.jsx";
 import Inventory from "./components/Inventory/Inventory.jsx";
 import LogoPage from "./components/LandingPage/LogoPage.jsx";
+import ItemInventory from "./components/Inventory/ItemInventory.jsx";
 
 //-- TODO:
-//  - [ ] BUG- check level function not firing when you actually hit the level...
+//-- [ ]
 
 export default function App() {
   const [view, setView] = useState(localStorage.getItem("view") ?? "archives");
@@ -21,19 +22,16 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const [newQuestCompletedCount, setNewQuestCompletedCount] = useState();
-  const [newAbandonedQuestCount, setNewAbandonedQuestCount] = useState();
-
   const [newDailyQuestsCompletedCount, setNewDailyQuestsCompletedCount] =
     useState();
   const [newAbandonedDailyQuestCount, setNewAbandonedDailyQuestCount] =
     useState();
   const [currentDailyQuests, setCurrentDailyQuests] = useState([]);
-  const [currentQuests, setCurrentQuests] = useState([]);
-
   const [updatedExp, setUpdatedExp] = useState();
+  const [gold, setGold] = useState();
 
-  //-- user "auth". check if user exists in local storage, set if not.  Set view state- 'archives' to local storage.
+  //-- Check if user exists in local storage, set if not.  
+  //-- Set view state- 'archives' to local storage.
   useEffect(() => {
     setIsLoading(true);
 
@@ -48,46 +46,46 @@ export default function App() {
         level: 1,
         experience: 0,
         nextLevelExperience: 10,
-        questCompleted: 0,
-        abandonedQuests: 0,
         dailyQuestsCompleted: 0,
         abandonedDailyQuests: 0,
         currentDailyQuests: [],
-        currentQuests: [],
         gold: 0,
         goldIncrease: 50,
       };
 
       localStorage.setItem("user", JSON.stringify(newUserObject));
-
       setUser(newUserObject);
+      setIsLoading(false);
+      return;
+    } else {
+      const parsedUser = JSON.parse(userExists);
+      setUser(parsedUser);
+      setView(localStorage.getItem("view") ?? "archives");
+
+      const user = JSON.parse(userExists);
+      setNewDailyQuestsCompletedCount(user.dailyQuestsCompleted);
+      setNewAbandonedDailyQuestCount(user.abandonedDailyQuests);
+      setCurrentDailyQuests(user.currentDailyQuests);
+      setUpdatedExp(user.experience);
+      setGold(user.gold);
+      setUser(user);
 
       setIsLoading(false);
-
-      return;
     }
+  }, [view, refreshKey]);
 
-    setUser(JSON.parse(userExists));
-
-    const savedView = localStorage.getItem("view");
-
-    // const user = localStorage.getItem("user");
-    // setNewDailyQuestsCompletedCount(user.dailyQuestsCompleted);
-    // setNewQuestCompletedCount(user.questCompleted);
-    // setNewAbandonedQuestCount(user.abandonedQuests);
-    // setNewAbandonedDailyQuestCount(user.abandonedDailyQuests);
-    // setCurrentDailyQuests(user.currentDailyQuests);
-    // setCurrentQuests(user.currentQuests);
-
-    setView(savedView ?? "archives");
-
-    setIsLoading(false);
-  }, [refreshKey, view]);
-
-  //-- spread over user object and conditionally update values... set state variables to user object values.
+  //-- SetUpdatedExp set to user object and check if level needs increased.
   useEffect(() => {
     if (!user) return;
 
+    setUpdatedExp(user.dailyQuestsCompleted);
+    chkLevelUp(user);
+    console.log("Current Quest var set to object");
+  }, [currentDailyQuests, newDailyQuestsCompletedCount]);
+
+  //-- Spread over user object and conditionally update values.
+  useEffect(() => {
+    if (!user) return;
     if (typeof user !== "object") {
       setUser(JSON.parse(user));
     }
@@ -99,47 +97,24 @@ export default function App() {
         ...(user.dailyQuestsCompleted !== newDailyQuestsCompletedCount
           ? { dailyQuestsCompleted: newDailyQuestsCompletedCount }
           : {}),
-        ...(user.questCompleted !== newQuestCompletedCount
-          ? { questCompleted: newQuestCompletedCount
-          }
-          : {}),
-        ...(user.abandonedQuests !== newAbandonedQuestCount
-          ? { abandonedQuests: newAbandonedQuestCount }
-          : {}),
         ...(user.abandonedDailyQuests !== newAbandonedDailyQuestCount
           ? { abandonedDailyQuests: newAbandonedDailyQuestCount }
           : {}),
         ...(user.experience !== updatedExp ? { experience: updatedExp } : {}),
+        ...(user.gold !== gold
+          ? { gold: gold } :{}
+        ),
         currentDailyQuests,
-        currentQuests
       })
     );
-    setNewDailyQuestsCompletedCount(user.dailyQuestsCompleted);
-    setNewQuestCompletedCount(user.questCompleted);
-    setNewAbandonedQuestCount(user.abandonedQuests);
-    setNewAbandonedDailyQuestCount(user.abandonedDailyQuests);
-    setCurrentDailyQuests(user.currentDailyQuests);
-    setCurrentQuests(user.currentQuests);
-
-    setUpdatedExp(user.questCompleted * 4 + user.dailyQuestsCompleted);
-    chkLevelUp(user);
-  }, [
-    view,
-    newDailyQuestsCompletedCount,
-    newQuestCompletedCount,
-    newAbandonedQuestCount,
-    newAbandonedDailyQuestCount,
-    updatedExp,
-  ]);
-
-  
-
-
+  }, [user, updatedExp, gold]);
 
   if (isLoading) return <LoadingIndicator />;
 
   return (
     <div className="bodywrapper">
+      {/* If there is no user, load the Logo/Landing Page first, otherwise hide
+      visability and run the rest of the app */}
       {!user || (!user.name && !isLoading) ? (
         <LogoPage
           user={user}
@@ -148,13 +123,14 @@ export default function App() {
         />
       ) : (
         <>
-          <header>brood leader</header>
+          <header>Eldergrove</header>
+          {/* Menu buttons to navigate components */}
           <div className="menuWrapper">
-            <button className="menuBtn" onClick={() => setView("dailies")}>
-              Dailies
-            </button>
             <button className="menuBtn" onClick={() => setView("quests")}>
               Quests
+            </button>
+            <button className="menuBtn" onClick={() => setView("Maps")}>
+              Maps
             </button>
             <button className="menuBtn" onClick={() => setView("market")}>
               Market
@@ -167,23 +143,19 @@ export default function App() {
             </button>
           </div>
           <div>
+            {/* Attaching 'view state' to components*/}
+            {view === "itemInventory" && !!user && (
+              <ItemInventory user={user} />
+            )}
             {view === "archives" && !!user && <Archives user={user} />}
-            {view === "brood" && !!user && <BroodRecord user={user} />}
-            {view === "market" && !!user && <Market user={user} />}
+            {view === "Spells" && !!user && <Spells user={user} />}
+            {view === "market" && !!user && <Market user={user}
+            gold={gold}
+            setGold={setGold} />}
             {view === "inventory" && !!user && <Inventory user={user} />}
+            {view === "Maps" && !!user && <Maps user={user} />}
             {view === "quests" && !!user && (
               <Quests
-                user={user}
-                newQuestCompletedCount={newQuestCompletedCount}
-                setNewQuestCompletedCount={setNewQuestCompletedCount}
-                newAbandonedQuestCount={newAbandonedQuestCount}
-                setNewAbandonedQuestCount={setNewAbandonedQuestCount}
-                currentQuests={currentQuests}
-                setCurrentQuests={setCurrentQuests}
-              />
-            )}
-            {view === "dailies" && !!user && (
-              <Dailies
                 user={user}
                 newDailyQuestsCompletedCount={newDailyQuestsCompletedCount}
                 setNewDailyQuestsCompletedCount={

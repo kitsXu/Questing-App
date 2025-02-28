@@ -1,9 +1,8 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { scrolls } from "./Data/scrollsData.js";
 import "./market.css";
 
-export default function Market(props) {
+export default function Scrolls(props) {
   //--dynamic state for selecting quantities of scrolls.
   const [scrollQtys, setScrollQtys] = useState(
     scrolls.reduce((acc, scrolls) => {
@@ -12,19 +11,6 @@ export default function Market(props) {
     }, {})
   );
   const [visibility, setVisibility] = useState(false);
-  const [marketMoney, setMarketMoney] = useState(props.user.gold);
-
-console.log(marketMoney);
-
-    //--Set current state of market money or gold to local storage.
-    useEffect(() => {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...props.user, gold: marketMoney })
-      );
-  
-      props.setGold(marketMoney);
-    }, [marketMoney]);
 
   //-- handle changing the quantity input.
   const handleChange = (e, scrollId) => {
@@ -39,43 +25,39 @@ console.log(marketMoney);
     e.preventDefault();
     const amount = scrollQtys[scrollId];
 
-    var currentMoney = marketMoney;
-
     //--handles the gold in local storage
-    if (currentMoney >= scrollCost * amount && amount > 0) {
-      currentMoney -= scrollCost * amount;
-      alert("Purchase complete!  Go check your inventory!");
+    if (props.user.gold >= scrollCost * amount) {
+      props.user.gold -= scrollCost * amount;
       console.log(`PURCHASE COMPLETE for ${amount} ${scrollId} --`, props.user);
-      setMarketMoney(currentMoney);
 
       //-- get stored inventory array from local storage
       //-- create new object from scrollData
       //-- add new object to array
       //-- again set to local storage
 
-      let scrollInv = JSON.parse(localStorage.getItem("scrollInv")) || [];
+      let scrollInv = JSON.parse(localStorage.getItem('scrollInv')) || [];
 
       const uniqueId = crypto.randomUUID();
       const scrollKey = `${scrollId}-${uniqueId}`;
 
       const newScroll = {
+      //--creates the items in local storag
         id: scrollKey,
         name: scrollId,
         amount: amount,
         cost: scrollCost,
-      };
+   }
       scrollInv.push(newScroll);
 
-      localStorage.setItem("scrollInv", JSON.stringify(scrollInv));
+      localStorage.setItem('scrollInv', JSON.stringify(scrollInv));
 
-    } else {
-      if (props.user.gold === 0) {
-        console.log("Not enough gold!");
-        alert("Not Enough Gold!");
-      } else {
-        console.log("SCROLL QTY");
-        alert("Please select Quantity");
-      }
+      //--logs results... handle not having enough gold
+      console.log("scrolls saved to localStorage:", scrollInv);
+    } 
+    else
+     {
+      console.log("Not enough gold!");
+      alert("Not Enough Gold!");
     }
   };
 
@@ -86,9 +68,7 @@ console.log(marketMoney);
   }
 
   return (
-    <div className="profile">
-      <div className="headDivider">§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§</div>{" "}
-      <div className="totalGold">Gold: {props.user.gold}</div>
+    <div className="scrollProfile">
       <div className="questHeaderWrap">
         <h1 className="userHeader">The Inked Eldergrove</h1>
         <button className="questExplanation" onClick={showHide}>
@@ -97,10 +77,10 @@ console.log(marketMoney);
       </div>
       {visibility && (
         <p className="scroll-info">
-          Welcome to The Inked Eldergrove! We're in the business of selling
-          magical scrolls that guide you through your chosen discipline. We give
-          a HUGE discount to first time buyers, so make sure to choose your first
-          scroll wisely!
+          Welcome to The Inked Eldergrove! In the future there is going to be
+          more instruction here for buying, selling, and creating your own spell
+          scrolls... we'll even have a Shop keeper for you to meet! Come back
+          once renvations are complete!
         </p>
       )}
       {scrolls.map((scroll) => (
@@ -128,16 +108,10 @@ console.log(marketMoney);
                 </button>
               </form>
             </div>
-            <div className="market-divider">_______</div>
           </label>
         </div>
       ))}
-      <div className="headDivider">§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§</div>{" "}
-      <div className="logo">
-        <a className="logo-tag-market" href="https://ko-fi.com/kitsxu">
-          -kitsXu-
-        </a>
-      </div>
+      <div className="divider">_________</div>
     </div>
   );
 }

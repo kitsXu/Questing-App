@@ -1,24 +1,84 @@
 /*--RECORDS PAGE--*/
+
+.user-Header {
+  background:hsl(116, 13%, 22%);
+  text-align: center;
+  color: hsl(120, 55%, 96%);
+  font-size: 2rem;
+  margin: auto;
+  width: 80%;
+  line-height: 50px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  border-width: 4px;
+  border-color:hsla(61, 24%, 53%, 0.781);
+  border-style:double;
+  border-width: 10px;
+  & {
+    @media (width <= 540px) {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.name-rank {
+  background: hsla(61, 24%, 53%, 0.781);
+  box-shadow: inset 3px 3px 6px black;
+
+}
+
+.profile-divider {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: #e3e6cc;
+  width: 100%;
+  color: #9791b9;
+  font-size: 6rem;
+  word-break: break-all;
+}
+
 .profileInfo {
-  background: #e6e3cc;
+  background: #e3e6cc;
+  color: hsl(117, 21%, 35%);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: 60px;
+  padding-top: 25px;
   padding-bottom: 40px;
   padding-left: 60px;
-  row-gap: 40px;
+  row-gap: 30px;
+  & {
+    @media (width <= 540px) {
+      padding-left: 20px;
+      row-gap: 20px;
+    }
+  }
 }
 
 .profile {
-  background: #e6e3cc;
+  background: #e3e6cc;
+  font-size: 2rem;
+  & {
+    @media (width <= 540px) {
+      font-size: 1.2rem;
+    }
+  }
 }
 
 .logo-tag-archive {
-  background: #e6e3cc;
+  background: #e3e6cc;
   text-decoration: none;
-  margin-top: 7.8vh;
-  color: hsl(41, 39%, 23%);
-  cursor:default;
-  font-size: 12px;
+  margin-top: 5vh;
+  color: hsl(0, 41%, 31%);
+  cursor: default;
+  font-size: 1rem;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  & {
+    @media (width <= 540px) {
+      font-size: 0.8rem;
+    }
+  }
 }

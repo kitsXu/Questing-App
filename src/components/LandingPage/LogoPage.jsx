@@ -1,10 +1,9 @@
 import React from "react";
 import { useState } from "react";
-import LandingPage from "./LandingPage.jsx";
-import dragon from "./images/dragon4.png";
+import { LoadingIndicator } from "./LoadingIndicator.jsx";
+import SetUsername from "./SetUsername.jsx";
 import kit from "./images/kit1.png";
 import "./Logo.css";
-import { LoadingIndicator } from "./LoadingIndicator.jsx";
 
 export default function LogoPage(props) {
   const [landingPageVisibility, setLandingPageVisibility] = useState(false);
@@ -22,32 +21,29 @@ export default function LogoPage(props) {
 
   return (
     <div className="bodyWrapper">
-      {logoVisibility && <div className="landing-divider">_________</div>}
-      {logoVisibility && (
-        <header className="landingHeader">brood leader</header>
-      )}
       <div className="logoPage">
-        {logoVisibility && <img className="fox" src={dragon}></img>}
+        {logoVisibility && <img className="fox" src={kit}></img>}
+
+        {logoVisibility && (
+          <a className="logo-tag-logo" href="https://ko-fi.com/kitsxu">
+            -kitsXu apps-
+          </a>
+        )}
+        {logoVisibility && (
+          <header className="landingHeader">Echoes of the Eldergrove</header>
+        )}
         {logoVisibility && (
           <div className="btnWrapper">
-            <label className="playBtnTag">Press 'Play' to start</label>
+            <label className="playBtnTag">Press 'Play' to begin</label>
             <button className="playBtn" onClick={handleClick}>
               Play
             </button>
           </div>
         )}
-        {logoVisibility && <div className="foot-divider">______________</div>}
+        {logoVisibility && <div className="landing-divider-bottom">______________</div>}
 
-        {logoVisibility && (
-          <div className="logo">
-            <img className="logo-image" src={kit}></img>
-            <a className="logo-tag-logo" href="https://ko-fi.com/kitsxu">
-              -kitsXu apps-
-            </a>
-          </div>
-        )}
         {landingPageVisibility && (
-          <LandingPage
+          <SetUsername
             user={props.user}
             isLoading={props.isLoading}
             setRefreshKey={props.setRefreshKey}

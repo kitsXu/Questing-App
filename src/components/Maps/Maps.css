@@ -1,0 +1,57 @@
+.questWrapper {
+  background: #e3e6cc;
+}
+
+
+.profile-maps {
+  background: #e3e6cc;
+  margin-top: 50px;
+  text-align: center;
+  font-size: 2.5rem;
+  color: hsl(120, 41%, 31%);
+
+  & {
+    @media (width <= 540px) {
+      font-size: 1.8rem;
+    }
+  }
+}
+.profile-maps-info {
+  background: #e3e6cc;
+  color:hsl(117, 21%, 35%);
+  margin-top: 40px;
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 35px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+  "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  & {
+    @media (width <= 540px) {
+      margin-top: 10px;
+      font-size: .85rem;
+      line-height: 30px;
+    }
+  }
+}
+
+.mapsWrapper {
+  background: #e3e6cc;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 100px;
+}
+
+.logo-tag-quest {
+  background: #e3e6cc;
+  text-decoration: none;
+  color: hsl(0, 39%, 23%);
+  cursor: default;
+  font-size: 1rem;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    & {
+      @media (width <= 540px) {
+        font-size: .8rem;
+      }
+    }
+  }

@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import "./inventory.css";
-import BroodRecord from "./BroodRecord.jsx";
+import BroodRecord from "./Spells.jsx";
 import ItemInventory from "./ItemInventory.jsx";
 
 export default function Inventory(props) {
@@ -9,22 +9,20 @@ export default function Inventory(props) {
 
   return (
     <div className="profile">
-      <div className="headDivider">§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§</div>
-      <h1 className="inventoryHeader">{props.user.name}'s Inventory</h1>
+      <div className="headDivider">§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§</div>{" "}
       <div className="inventoryButtons">
-        <button className="menuBtn" onClick={() => setView("itemInventory")}>
-          Item Inventory{" "}
+        <button
+          className="menuBtn-inventory"
+          onClick={() => setView("itemInventory")}
+        >
+          Items{" "}
         </button>
-        <button className="menuBtn" onClick={() => setView("brood")}>
-          Brood
+        <button className="menuBtn-inventory" onClick={() => setView("spells")}>
+          Spells
         </button>
-      </div>
-      <div className="totalGold">Total Gold: {props.user.gold}</div>
-      <div>
         {view === "itemInventory" && <ItemInventory user={props.user} />}
-        {view === "brood" && <BroodRecord user={props.user} />}
+        {view === "spells" && <BroodRecord user={props.user} />}
       </div>
-      <div className="divider">_________</div>
     </div>
   );
 }

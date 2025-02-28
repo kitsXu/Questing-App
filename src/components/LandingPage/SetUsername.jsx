@@ -1,7 +1,7 @@
-import "./LandingPage.css";
+import "./SetUsername.css";
 import { useState } from "react";
 
-export default function LandingPage(props) {
+export default function SetUsername(props) {
   const [newName, setNewName] = useState("");
 
   //-- set user's name
@@ -23,30 +23,23 @@ export default function LandingPage(props) {
   return (
     <>
       <div className="landingBodyWrap">
-        <div className="welcome">Welcome, Adventurer!</div>
-        <div className="intro">... to our little village of Scales Haven.</div>
+        <div className="welcome">Welcome! </div>
         <div className="intro">
-          SO, you've heard about the dragon eggs? And you expect to collect as
-          many as you can to raise a dragon army? Dangerous, dumb, but
-          understandable!
+          You stand at the threshold of the Eldergrove- a nature-based school of
+          mystics and magic.
         </div>
         <div className="intro">
-          Not so fast, though! You have to earn your keep before the dragons
-          will let you have even one of their precious eggs!
+          It is my assumption, by seeing you here, that you wish to study at our
+          school?
         </div>
         <div className="intro">
-          ALL Brood Leaders, even seasoned ones, are expected to complete their
-          daily routines, as well as a few additional quests to get and keep
-          their eggs. Be consistent enough and a dragon egg could be yours!{" "}
+          Few are worthy of the secrets that live inside the grove, but I am not
+          one to deny opportunities.
         </div>
-        <div className="intro">
-          Although, then you have to figure out what to do with it...
+        <div className="inputBarInstruct">
+          If you are ready to take on the challenge, give the Eldergrove your
+          name!
         </div>
-        <div className="foot">
-          If you are ready to accept the risks, go ahead and enter your name
-          below!
-        </div>
-
         <form
           className="nameInput"
           onSubmit={(e) => {
@@ -54,7 +47,6 @@ export default function LandingPage(props) {
             handleSubmit(newName);
           }}
         >
-          <label htmlFor="nameInputBar">NAME</label>
           <input
             value={newName}
             type="text"
